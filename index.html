@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nossa História</title>
+  <style>
+    /* ===== Reset & base ===== */
+    :root{
+      --bg:#fff6f8; --accent:#ff6b9a; --accent-dark:#c03a62; --muted:#6b6b6b;
+      --card: rgba(255,255,255,0.7);
+      --glass: rgba(255,255,255,0.55);
+      --shadow: 0 8px 24px rgba(0,0,0,0.12);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#fff6f8 0%, #ffeef4 100%);color:#222}
+    img{max-width:100%;display:block;border-radius:12px}
+    .container{max-width:920px;margin:0 auto;padding:20px}
+
+    /* ===== Intro overlay (music + play) ===== */
+    .intro-overlay{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:60;
+      background:radial-gradient(ellipse at center, rgba(0,0,0,0.35), rgba(0,0,0,0.55));backdrop-filter: blur(4px);
+      color:white;padding:24px;text-align:center;overflow:auto
+    }
+    .intro-card{background:var(--card);padding:22px;border-radius:14px;max-width:540px;box-shadow:var(--shadow);color:#222}
+    .play-btn{background:linear-gradient(90deg,var(--accent),var(--accent-dark));border:none;color:white;padding:14px 20px;border-radius:10px;font-weight:700;font-size:18px;cursor:pointer}
+    .muted-note{color:var(--muted);font-size:14px;margin-top:10px}
+
+    /* ===== Header ===== */
+    header{padding:36px 0 12px}
+    h1{font-size:28px;margin:0 0 8px}
+    .subtitle{color:var(--muted);margin-bottom:8px}
+
+    /* ===== Moon + timer card ===== */
+    .hero{display:grid;grid-template-columns:1fr 160px;gap:18px;align-items:center}
+    @media(max-width:640px){.hero{grid-template-columns:1fr;}}
+    .story-card{background:var(--glass);padding:18px;border-radius:14px;box-shadow:var(--shadow)}
+    .meta{font-size:14px;color:var(--muted)}
+    .timer{font-size:20px;font-weight:700;margin-top:10px}
+    .moon{display:flex;flex-direction:column;align-items:center;gap:8px}
+    .moon .moon-ico{width:120px;height:120px;border-radius:999px;background:linear-gradient(180deg,#fff, #f0e6ff);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,0.15);position:relative}
+    .moon .crescent{position:absolute;right:26px;top:18px;width:64px;height:84px;border-radius:50%;background:#fff6f8;transform:rotate(12deg)}
+    .moon .label{font-weight:700}
+
+    /* ===== Sections (timeline) ===== */
+    section.block{margin:28px 0;padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.75));box-shadow:var(--shadow);opacity:0;transform:translateY(20px);transition:all .6s ease}
+    section.block.visible{opacity:1;transform:none}
+    .block h2{margin-top:0}
+    .block .photo{margin-top:12px}
+
+    /* ===== Gallery ===== */
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    @media(max-width:640px){.gallery-grid{grid-template-columns:repeat(2,1fr)}}
+
+    /* ===== Final call ===== */
+    .final{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;padding:28px}
+    .cta{font-size:22px;font-weight:800}
+    .btns{display:flex;gap:12px}
+    .btn{padding:12px 18px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+    .btn-yes{background:linear-gradient(90deg,#ff7bb0,#ff4f83);color:white}
+    .btn-no{background:#fff;border:2px solid #ffd7e6;color:#c03a62}
+
+    /* ===== Confetti/hearts animation ===== */
+    .hearts{position:fixed;inset:0;pointer-events:none;z-index:70}
+    .heart{position:absolute;font-size:20px;animation:floatUp 3s linear forwards;opacity:0}
+    @keyframes floatUp{0%{transform:translateY(0) scale(.8);opacity:0}10%{opacity:1}100%{transform:translateY(-420px) scale(1.2);opacity:0}}
+
+    /* ===== Footer ===== */
+    footer{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* ===== small helpers ===== */
+    .small{font-size:13px;color:var(--muted)}
+    .center{display:flex;align-items:center;justify-content:center}
+
+    /* smooth scroll */
+    html{scroll-behavior:smooth}
+  </style>
+</head>
+<body>
+  <!-- Intro overlay: user must press play to enable scroll and music -->
+  <div id="intro" class="intro-overlay" aria-hidden="false">
+    <div class="intro-card">
+      <h2 style="margin:0 0 8px">Nossa História</h2>
+      <p class="muted-note">Toque ▶️ para tocar nossa música e começar a viagem no tempo ✨</p>
+      <div style="height:12px"></div>
+      <button id="play" class="play-btn">▶️ Tocar & começar</button>
+      <p class="muted-note">(Recomendo usar fones — o site foi feito para ser visto no celular)</p>
+    </div>
+  </div>
+
+  <audio id="song" preload="none">
+    <!-- Coloque seu MP3 em images/song.mp3 ou altere o src depois -->
+    <source src="images/song.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container">
+    <header>
+      <h1>Nossa História</h1>
+      <div class="subtitle">Uma linha do tempo com nossos melhores momentos</div>
+    </header>
+
+    <div class="hero">
+      <div class="story-card">
+        <div class="meta">Conhecemos em: <strong>10/05/2025</strong></div>
+        <div class="meta">Estação: <strong>Outono</strong></div>
+        <div class="meta">Fase da Lua: <strong>Lua crescente</strong></div>
+        <div class="timer" id="timer">Carregando tempo...</div>
+        <p class="small">A lua iluminava o começo de nossa história.</p>
+      </div>
+
+      <div class="moon">
+        <div class="moon-ico" aria-hidden="true">
+          <!-- decoração de lua crescente fixa -->
+          <div style="width:100%;height:100%;border-radius:999px;background:linear-gradient(180deg,#fff3e8,#ffeef8);"></div>
+          <div class="crescent"></div>
+        </div>
+        <div class="label">Lua crescente</div>
+      </div>
+    </div>
+
+    <!-- TIMELINE BLOCKS -->
+    <section class="block" id="b1">
+      <h2>1 — Nosso primeiro momento juntos registrado</h2>
+      <p class="small">No zoológico — aquele dia que parecia uma cena de filme.</p>
+      <div class="photo"><img src="images/frame_01.jpg" alt="Zoológico - nosso primeiro momento"></div>
+    </section>
+
+    <section class="block" id="b2">
+      <h2>2 — Quando fomos no Lifebox</h2>
+      <p class="small">Lembranças, risadas e muito amor.</p>
+      <div class="photo"><img src="images/frame_02.jpg" alt="Lifebox"></div>
+    </section>
+
+    <section class="block" id="b3">
+      <h2>3 — Quando comi sushi a primeira vez</h2>
+      <p class="small">A primeira vez que você riu quando eu tentei usar hashis.</p>
+      <div class="photo"><img src="images/frame_03.jpg" alt="Sushi primeira vez"></div>
+    </section>
+
+    <section class="block" id="b4">
+      <h2>4 — Quando te pedi em namoro</h2>
+      <p class="small">Um momento que nunca vou esquecer.</p>
+      <div class="photo"><img src="images/frame_04.jpg" alt="Pedido em namoro"></div>
+    </section>
+
+    <section class="block" id="b5">
+      <h2>5 — Galeria de momentos nossos</h2>
+      <p class="small">Algumas memórias que eu escolhi guardar com carinho.</p>
+      <div class="gallery-grid" id="gallery">
+        <!-- coloque quantas imagens quiser aqui, ex: images/gallery1.jpg, gallery2.jpg ... -->
+        <img src="images/frame_05.jpg" alt="momento 1">
+        <img src="images/frame_06.jpg" alt="momento 2">
+        <img src="images/frame_07.jpg" alt="momento 3">
+        <img src="images/frame_08.jpg" alt="momento 4">
+        <img src="images/frame_09.jpg" alt="momento 5">
+        <img src="images/frame_10.jpg" alt="momento 6">
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="block final" id="final">
+      <div class="cta">Você aceita ser minha novamente?</div>
+      <div class="small">Eu juro continuar colecionando momentos com você.</div>
+      <div class="btns">
+        <button id="yes" class="btn btn-yes">💖 Sim</button>
+        <button id="no" class="btn btn-no">❌ Vou pensar</button>
+      </div>
+    </section>
+
+    <footer>
+      <div class="small">Feito com carinho</div>
+    </footer>
+  </div>
+
+  <div class="hearts" id="hearts"></div>
+
+  <script>
+    // ===== CONFIG =====
+    const startDate = new Date('2025-05-10T00:00:00'); // FIXO conforme pedido
+
+    // ===== Timer =====
+    function updateTimer(){
+      const now = new Date();
+      let diff = Math.floor((now - startDate) / 1000);
+      const days = Math.floor(diff / 86400); diff %= 86400;
+      const hours = Math.floor(diff / 3600); diff %= 3600;
+      const minutes = Math.floor(diff / 60); const seconds = diff % 60;
+      document.getElementById('timer').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+    updateTimer(); setInterval(updateTimer,1000);
+
+    // ===== Intersection observer for fade-in of sections =====
+    const obs = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+    },{threshold:0.18});
+    document.querySelectorAll('section.block').forEach(s=>obs.observe(s));
+
+    // ===== Music & intro behavior =====
+    const intro = document.getElementById('intro');
+    const btnPlay = document.getElementById('play');
+    const song = document.getElementById('song');
+
+    // disable page scroll until play
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    btnPlay.addEventListener('click', async ()=>{
+      try{
+        await song.play();
+      }catch(e){ /* autoplay may be blocked; user clicked anyway */ }
+      intro.style.display = 'none';
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    });
+
+    // ===== Final buttons behavior =====
+    const yes = document.getElementById('yes');
+    const no = document.getElementById('no');
+    const hearts = document.getElementById('hearts');
+
+    yes.addEventListener('click', ()=>{
+      // create several hearts/confetti
+      for(let i=0;i<18;i++){
+        const h = document.createElement('div');
+        h.className = 'heart';
+        h.textContent = '💖';
+        h.style.left = Math.random()*100 + '%';
+        h.style.top = Math.random()*80 + 20 + '%';
+        h.style.fontSize = (12 + Math.random()*28) + 'px';
+        hearts.appendChild(h);
+        // remove after animation
+        setTimeout(()=>h.remove(),3500);
+      }
+      yes.textContent = 'Te amo ❤️';
+      yes.disabled = true;
+    });
+
+    // "No" button foge do cursor
+    no.addEventListener('mouseover', ()=>moveNoButton());
+    no.addEventListener('click', ()=>{
+      // caso clique, damos uma resposta bonitinha
+      alert('Eu te amo! Me perdoa.💕');
+    });
+    function moveNoButton(){
+      const x = Math.random()*70 + 10; const y = Math.random()*10 + 45; // posição em %
+      no.style.transform = `translate(${x - 50}%, ${y - 50}%)`;
+    }
+
+    // ===== helper: allow keyboard to trigger play on Enter =====
+    btnPlay.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') btnPlay.click(); });
+
+  </script>
+</body>
+</html>
